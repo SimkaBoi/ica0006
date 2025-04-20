@@ -1,1 +1,273 @@
-# ica0006
+# ICA0006
+
+Grupp 9
+
+Grupi liikmed: Siim Ristjõe, Georg Veevo, Johann Buschmann
+
+## Ülesanne
+
+Igale grupile eraldatakse 3 füüsilist serverit ning 1 virtuaalne server.
+
+Kasutades HP serverite ILO kaughaldusliidest seadistada laboris riistvara peale RAID grupp operatsioonisüsteemi jaoks, installida endale sobiv serveri operatsioonisüsteem (3 füüsilist serverit)
+
+Serveritele paigaldada horisontaalselt skaleeruv tarkvara (CEPH, ScaleIO, Microsoft Storagespaces, MinIO, Lustre, LizardFS jms)
+
+Installeerida terraformi kasutades virtuaalserver ülikooli laborisse.
+
+Kasutajanimed ning paroolid on kõik samad nii ILO kui virtuaalserverisse sisse logimisel.
+
+Provisioneerida andmesalvestus pind virtuaalserverile üle IP võrgu (kas plokina, jagatud failisüsteemina või objektide salvestuskohana). Et muuta ülesanne realistlikumaks, panna seda pinda kasutama kas andmebaas või mingi veebirakendus. Veenduda süsteemi tõrkekindluses, lülitades välja suvaline füüsiline server.
+
+## Serverid ning kasutajaandmed
+
+### Serverid
+
+|Serveri nimi|Serveri IP    |ILO IP       |
+|------------|--------------|-------------|
+|server1     |192.168.185.21|192.168.185.1|
+|server2     |192.168.185.22|192.168.185.2|
+|server3     |192.168.185.23|192.168.185.3|
+
+### Kasutajaandmed
+
+Lihtsuse mõttes otsustasime kasutada kõikjal sama kasutajat ning parooli.
+
+|Nimi   |Parool     |
+|-------|-----------|
+|student|student1234|
+
+## RAIDi seadistamine
+
+Selleks, et ILO kaughaldusliidesele ligi pääseda, tuleb kasutada Microsoft Edge'i ning Internet Exploreri compatibility mode'i. Samuti peab olema ühendatud kooli sisevõrku.
+
+Seejärel tuleb serverid käima panna ja kui pilt tuleb ette, vajutada `F8` nuppu. Avaneb menüü, kus tuleb taas vajutada `F8` nuppu.
+
+![alt text](/images/image.png)
+
+Pärast seda avaneb uus menüü, kust tuleb lahkuda.
+
+![alt text](/images/image-1.png)
+
+Lähtuvalt ülesande tekstist lõime operatsioonisüsteemile eraldi `RAID 1+0` grupi, mis koosneb kahest 300GB kettast. Ülejäänud 900GB kettad panime eraldi `RAID 0` gruppidesse.
+
+![alt text](/images/image-2.png)
+
+## Operatsioonisüsteemi installimine
+
+Otsustasime operatsioonisüsteemiks valida [Ubuntu server 24.04](https://ubuntu.com/download/server).
+
+Installi käigus määrasime serveritele staatilise IP koos subnet'i ja default gateway'ga.
+
+|Serveri nimi|Serveri IP    |
+|------------|--------------|
+|server1     |192.168.185.21|
+|server2     |192.168.185.22|
+|server3     |192.168.185.23|
+
+Subnet: `255.255.252.0`
+Default gateway: `192.168.187.254`
+
+Kasutaja loomisel määrasime kasutajanimeks `student` ning parooliks `student1234`.
+
+Pärast operatsioonisüsteemi installi uuendasime servereid.
+
+```bash
+sudo apt update && sudo apt upgrade
+```
+
+## SSH seadistamine
+
+Pärast operatsioonisüsteemi installi lisasime kasutajasse `student` grupi liikmete avalikud SSH võtmed.
+
+```bash
+curl -s https://github.com/{simkaboi,jbuschtal,geveev}.keys > ~/.ssh/authorized_keys
+```
+
+Seejärel veendusime, et ligipääs serveritesse läbi SSH töötab.
+
+```bash
+ssh student@192.168.185.2x
+```
+
+## Cephi seadistamine
+
+Otsustasime andmete hoiustamiseks kasutada [Cephi](https://ceph.io/en/) ning selle ametlikku tööriista [Cephadm](https://docs.ceph.com/en/latest/cephadm/).
+
+### Cephadm'i install
+
+Cephadm'i installimiseks kasutatud dokumentatsioon asub [siin](https://docs.ceph.com/en/latest/cephadm/install/#install-cephadm).
+
+Alustuseks tuli välja valida server, kuhu installime Cephadm'i. See server hakkab Cephi manageerima. Valisime selleks serveriks `server1`.
+
+Cephadm'i installimiseks on kasutasime järgnevat käsku:
+
+```bash
+sudo apt install -y cephadm
+```
+
+Pärast installi veendusime et Cephadm töötab:
+
+```bash
+cephadm
+```
+
+### Ceph klastri loomine
+
+Ceph klastri loomiseks kasutatud dokumentatsioon asub [siin](https://docs.ceph.com/en/latest/cephadm/install/#bootstrap-a-new-cluster).
+
+Olles `server1` terminalis, jooksutasime järgnevat käsku:
+
+```bash
+sudo cephadm bootstrap --mon-ip 192.168.185.21
+```
+
+Pärast käsu käivitamist kuvatakse terminalis linki https://192.168.185.21:8443/, kust saab ligi Ceph'i dashboardile.
+
+### Ceph CLI käskude lubamine
+
+Ceph CLI käskude lubamiseks kasutatud dokumentatsioon asub [siin](https://docs.ceph.com/en/latest/cephadm/install/#enable-ceph-cli).
+
+Praegu on võimalik Ceph'i käske jooksutada ainult Cephadm'i loodud konteinerite sees. Selleks, et käske saaks väljaspool kasutada, pidime installima `ceph-common` paketi.
+
+```bash
+cephadm add-repo --release squid
+cephadm install ceph-common
+```
+
+Kontrolliks kasutasime järgnevat käsku:
+
+```bash
+ceph -v
+```
+
+### Hostide lisamine Cephi klastrisse
+
+Hostide lisamiseks kasutatud dokumentatsioon asub [siin](https://docs.ceph.com/en/latest/cephadm/host-management/#adding-hosts).
+
+Hetkel koosneb Ceph'i klaster ainult ühest serverist (`server1`), kuid serverid `server2` ja `server3` tuleb ka lisada.
+
+Enne serverite lisamist Cephi klastrisse peavad serveritel olema installitud järgnevad [paketid](https://docs.ceph.com/en/latest/cephadm/install/#requirements):
+
+- Python 3
+- Systemd
+- Podman/Docker
+- Chrony
+- LVM2
+
+Kuna enamik pakette tuli koos Ubuntu installiga kaasa, oli meil ainult [dockerit](https://docs.docker.com/engine/install/ubuntu/) vaja installida.
+
+Selleks jooksutasime järgnevaid käske:
+
+```bash
+sudo apt-get update
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+```
+
+Pärast installi veendusime, et Docker töötab:
+
+```bash
+sudo docker run hello-world
+```
+
+Nüüd kui eeldused on täidetud, on vaja `server1` Ceph'i avalik võti lisada teistele serveritele.
+
+Kuna `ssh-copy-id` käsk nõuab parooliga sisselogimist, on vaja teistes serverites parooliga sisselogimine ajutiselt lubada. Lisaks, kuna avalik võti peab olema kasutaja `root` kaustas, lubame ajutiselt `root` kasutajasse sisselogimise parooliga.
+
+Selleks lõime uue faili `/etc/ssh/sshd_config.d/00-custom.conf`
+
+```bash
+sudo vim /etc/ssh/sshd_config.d/00-custom.conf
+```
+
+ning lisasime sinna järgnevad read:
+
+```
+PasswordAuthentication yes
+PermitRootLogin yes
+```
+
+Seejärel tegime SSH teenusele restarti, et muudatused hakkaksid tööle
+
+```bash
+sudo systemctl restart ssh
+```
+
+ning veendusime, et muudatused oleksid paigaldatud:
+
+```bash
+sudo sshd -T | grep -E 'passwordauthentication|permitrootlogin'
+```
+
+Pärast SSH konfiguratsiooni muutmist saime lisada Ceph'i avaliku võtme:
+
+```bash
+ssh-copy-id -f -i /etc/ceph/ceph.pub root@192.168.185.22
+ssh-copy-id -f -i /etc/ceph/ceph.pub root@192.168.185.23
+```
+
+Pärast avaliku võtme lisamist saime failis `/etc/ssh/sshd_config.d/00-custom.conf` read välja kommenteerida, SSH teenusele restarti teha ning veenduda, et muudatused läksid täide.
+
+Viimase sammuna lisasime serverid `server2` ja `server3` Ceph'i klastrisse ning veendusime, et serverid said edukalt lisatud.
+
+```bash
+sudo ceph orch host add server2 192.168.185.22
+sudo ceph orch host add server3 192.168.185.23
+sudo ceph orch host ls --detail
+```
+
+### Ketaste lisamine ja volüümi loomine
+
+Esmalt veendusime, et igal serveril oleksid 2x900GB kettad tühjad:
+
+```bash
+sudo wipefs -a /dev/sdb
+sudo wipefs -a /dev/sdc
+```
+
+Seejärel veendusime, et Ceph näeks kõiki saadaval kettaid:
+
+```bash
+sudo ceph orch device ls
+```
+
+Siis lisasime kõik kettad Cephi klastrisse:
+
+```bash
+sudo ceph orch apply osd --all-available-devices
+```
+
+Viimasena lõime volüümi ning veendusime, et kõik töötaks:
+
+```bash
+sudo ceph fs volume create cephfilesystem
+sudo ceph -s
+```
+
+```
+student@server1:~# sudo ceph -s
+  cluster:
+    id:     f8f1d956-1df3-11f0-99e7-3b8bca07a27c
+    health: HEALTH_OK
+ 
+  services:
+    mon: 3 daemons, quorum server1,server2,server3 (age 3h)
+    mgr: server1.jadojs(active, since 5h), standbys: server2.esbgns
+    mds: 1/1 daemons up, 2 standby
+    osd: 6 osds: 6 up (since 26m), 6 in (since 27m)
+ 
+  data:
+    volumes: 1/1 healthy
+    pools:   2 pools, 272 pgs
+    objects: 22 objects, 2.3 KiB
+    usage:   1.7 GiB used, 4.9 TiB / 4.9 TiB avail
+    pgs:     272 active+clean
+```
