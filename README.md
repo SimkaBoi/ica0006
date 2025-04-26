@@ -271,3 +271,151 @@ student@server1:~# sudo ceph -s
     usage:   1.7 GiB used, 4.9 TiB / 4.9 TiB avail
     pgs:     272 active+clean
 ```
+
+## Virtuaalserveri installeerimine
+
+### Terraformi installimine Windowsile
+
+Terraformi installimiseks Windowsile laadisime selle HashiCorpi ametlikult veebilehelt.  
+
+1. Laadisime alla `terraform_1.11.4_windows_amd64.zip\` ja pakkisime kausta `C:\Terraform\`.  
+2. Lisasime `C:\Terraform\` keskkonnamuutujasse `Path\`.  
+3. Pärast PowerShelli taaskäivitamist kontrollisime:
+
+    ```powershell
+    terraform --version
+    ```
+
+    ```
+    Terraform v1.11.4
+    on windows_amd64
+    ```
+
+---
+
+### Projekti seadistamine
+
+Lõime Terraformi projekti jaoks kausta ning faili `main.tf` virtuaalmasina loomise haldamiseks.
+
+```powershell
+mkdir $env:USERPROFILE\TerraformProjects\ica0006
+cd $env:USERPROFILE\TerraformProjects\ica0006
+New-Item main.tf
+```
+
+Avasime `main.tf` Notepadis ja lisasime järgiva skripti, mis loob virtuaalmasina vSphere keskkonnas:
+
+```hcl
+provider "vsphere" {
+  user                 = "UNI-ID@intra.ttu.ee"
+  password             = "PASSWORD"
+  vsphere_server       = "192.168.184.253"
+  allow_unverified_ssl = true
+}
+
+data "vsphere_datacenter" "dc" {
+  name = "Datacenter_407"
+}
+
+data "vsphere_resource_pool" "pool" {
+  name          = "HPE BladeSystem Gen8 - Rack 3/Resources"
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
+
+data "vsphere_datastore" "datastore" {
+  name          = "Hitachi_LUN1"
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
+
+data "vsphere_network" "network" {
+  name          = "VM Network"
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
+
+data "vsphere_virtual_machine" "template" {
+  name          = "Ubuntu 22.04 vanilla template"
+  datacenter_id = data.vsphere_datacenter.dc.id
+}
+
+resource "vsphere_virtual_machine" "demo" {
+  name             = "grupp_9"
+  num_cpus         = 2
+  memory           = 4096
+  datastore_id     = data.vsphere_datastore.datastore.id
+  resource_pool_id = data.vsphere_resource_pool.pool.id
+  guest_id         = data.vsphere_virtual_machine.template.guest_id
+  scsi_type        = data.vsphere_virtual_machine.template.scsi_type
+  folder           = "ICA0006"
+
+  network_interface {
+    network_id = data.vsphere_network.network.id
+  }
+
+  disk {
+    label              = "vm-one.vmdk"
+    size               = 50
+    eagerly_scrub      = false
+    thin_provisioned   = true
+  }
+
+  clone {
+    template_uuid = data.vsphere_virtual_machine.template.id
+  }
+}
+```
+
+---
+
+### Terraformi initsialiseerimine ja virtuaalmasina loomine
+
+Initsialiseerisime Terraformi:
+
+```powershell
+terraform init
+```
+
+```text
+- Installed hashicorp/vsphere v2.12.0 (signed by HashiCorp)
+Terraform has been successfully initialized!
+```
+
+Kontrollisime plaani:
+
+```powershell
+terraform plan
+```
+
+```text
+Plan: 1 to add, 0 to change, 0 to destroy.
+```
+
+Rakendasime konfiguratsiooni:
+
+```powershell
+terraform apply --auto-approve
+```
+
+```text
+vsphere_virtual_machine.demo: Creation complete after 57s [id=42166ee0-72ed-e251-4ca3-ad92d1631f9a]
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+```
+
+Kontrollisime virtuaalmasina detaile:
+
+```powershell
+terraform state show vsphere_virtual_machine.demo
+```
+
+```text
+# vsphere_virtual_machine.demo:
+resource "vsphere_virtual_machine" "demo" {
+    default_ip_address = "192.168.180.26"
+    name               = "grupp_9"
+    memory             = 4096
+    num_cpus           = 2
+}
+```EOF
+
+echo "Markdown file 'ICA0006.md' has been generated."
+
+
