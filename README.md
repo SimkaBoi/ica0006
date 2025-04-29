@@ -28,6 +28,10 @@ Provisioneerida andmesalvestus pind virtuaalserverile üle IP võrgu (kas plokin
 |server2     |192.168.185.22|192.168.185.2|
 |server3     |192.168.185.23|192.168.185.3|
 
+### Virtuaalmasin
+
+IP aadress `192.168.180.26`
+
 ### Kasutajaandmed
 
 Lihtsuse mõttes otsustasime kasutada kõikjal sama kasutajat ning parooli.
