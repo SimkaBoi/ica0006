@@ -426,9 +426,18 @@ Siit näeme virtuaalmasina automaatselt määratud IP aadressi ja meie pandud ni
 
 ## Minecrafti serveri seadistamine virtuaalmasinas
 
+Pärast virtuaalmasina loomist Terraformiga seadistasime Minecrafti serveri virtuaalmasinas (IP: `192.168.180.26`), et täita ülesande nõuet panna andmesalvestusala kasutama veebirakendus.
 Minecrafti serveri jaoks kasutatud dokumentatsioon asub [siin](https://idroot.us/install-minecraft-server-ubuntu-24-04/).
 
-Pärast virtuaalmasina loomist Terraformiga seadistasime Minecrafti serveri virtuaalmasinas (IP: `192.168.180.26`), et täita ülesande nõuet panna andmesalvestusala kasutama veebirakendus.
+### Kasutaja loomine
+
+Minecrafti serveri turvaliseks haldamiseks on soovitatav luua eraldi kasutajakonto. See aitab hoida Minecrafti protsessi isoleerituna ja vähendada turvariske.
+
+Logisime sisse serverisse ja tegime uus kasutaja nimega minecraft:
+`sudo adduser minecraft`
+
+Logisime kasutajakontole sisse:
+`su - minecraft`
 
 ### Minecrafti serveri allalaadimine
 
