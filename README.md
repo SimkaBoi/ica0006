@@ -419,3 +419,50 @@ resource "vsphere_virtual_machine" "demo" {
 echo "Markdown file 'ICA0006.md' has been generated."
 ```
 Siit näeme virtuaalmasina automaatselt määratud IP aadressi ja meie pandud nime "grupp_9".
+
+## Minecrafti serveri seadistamine virtuaalmasinas
+
+Minecrafti serveri jaoks kasutatud dokumentatsioon asub [siin](https://idroot.us/install-minecraft-server-ubuntu-24-04/).
+
+Pärast virtuaalmasina loomist Terraformiga seadistasime Minecrafti serveri virtuaalmasinas (IP: `192.168.180.26`), et täita ülesande nõuet panna andmesalvestusala kasutama veebirakendus.
+
+### Minecrafti serveri allalaadimine
+
+Logisime virtuaalmasinasse kasutajaga `minecraft` ja lõime kausta `minecraft_server` serverifailide jaoks. Laadisime alla PaperMC serveri JAR-faili versioonile 1.21.4:
+
+```bash
+mkdir minecraft_server
+cd minecraft_server
+wget https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/226/downloads/paper-1.21.4-226.jar
+```
+### Minecrafti serveri käivitamine
+
+Käivitasime serveri:
+
+```bash
+java -Xmx1024M -Xms1024M -jar paper-1.21.4-226.jar nogui
+```
+
+Server käivitus, kuid peatus, kuna pidime nõustuma EULA-ga:
+
+Väljund (lühendatud):
+
+```
+[18:49:09 WARN]: Failed to load eula.txt
+[18:49:09 INFO]: You need to agree to the EULA in order to run the server. Go to eula.txt for more info.
+```
+
+### EULA ja serveri seadete muutmine
+
+Muutsime `eula.txt` faili, et nõustuda EULA-ga, ja kohandasime `server.properties` faili vastavalt vajadusele (nt mängurežiim, port jne):
+
+```bash
+nano eula.txt
+nano server.properties
+```
+
+Failis `eula.txt` asendasime rea `eula=false` reaga `eula=true`.
+
+![image](https://github.com/user-attachments/assets/8cd48e07-0c15-49df-91de-f71f476be0c3)
+
+
