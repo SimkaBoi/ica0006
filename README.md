@@ -417,5 +417,6 @@ resource "vsphere_virtual_machine" "demo" {
 ```EOF
 
 echo "Markdown file 'ICA0006.md' has been generated."
-
+```
+Siit näeme virtuaalmasina automaatselt määratud IP aadressi ja serveri nime "grupp_9".
 
