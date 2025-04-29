@@ -478,4 +478,24 @@ Failis `eula.txt` asendasime rea `eula=false` reaga `eula=true`.
 
 ![image](https://github.com/user-attachments/assets/8cd48e07-0c15-49df-91de-f71f476be0c3)
 
+### Serveri uuesti käivitamine
 
+Käivitasime serveri uuesti:
+
+```bash
+java -Xmx1024M -Xms1024M -jar paper-1.21.4-226.jar nogui
+```
+
+Seekord server käivitus edukalt, kuigi ilmnes võrguühenduse tõrge Yggdrasil autentimisteenusega:
+
+Väljund (lühendatud):
+
+```
+[18:53:48 ERROR]: Failed to request yggdrasil public key
+com.mojang.authlib.exceptions.MinecraftClientException: Failed to read from https://api.minecraftservices.com/publickeys due to Connect timed out
+...
+[18:54:12 INFO]: Done preparing level "world" (24.157s)
+[18:54:12 INFO]: Done (34.251s)! For help, type "help"
+```
+
+Vaatamata võrguveale server töötas ja maailm (`world`) loodi edukalt. Minecrafti server oli nüüd käivitatud ja valmis kasutamiseks.
