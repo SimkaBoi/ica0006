@@ -499,3 +499,41 @@ com.mojang.authlib.exceptions.MinecraftClientException: Failed to read from http
 ```
 
 Vaatamata võrguveale server töötas ja maailm (`world`) loodi edukalt. Minecrafti server oli nüüd käivitatud ja valmis kasutamiseks.
+
+### VM-i cephi külge mountimine
+
+Selleks et VM Cephiga ühendada on vaja installida VM-ile ceph-common
+
+```bash
+sudo apt update
+sudo apt install -y ceph-common
+```
+
+Kopeerisime Server-1lt cephi confi ja ceph admin keyringi
+
+```bash
+root@server1:~# scp /etc/ceph/ceph.conf student@192.168.180.26:/tmp/ceph.conf
+student@192.168.180.26's password:
+ceph.conf                                                                             100%  283   363.0KB/s   00:00
+minecraft@lab:/home/student$ sudo mv /tmp/ceph.conf /etc/ceph/
+
+root@server1:~# scp /etc/ceph/ceph.client.admin.keyring student@192.168.180.26:/tmp/ceph.client.admin.keyring
+student@192.168.180.26's password:
+ceph.client.admin.keyring                                                             100%  151   207.6KB/s   00:00
+minecraft@lab:~$ sudo mv /tmp/ceph.client.admin.keyring /etc/ceph/ceph.client.admin.keyring
+```
+
+Cephi mountimiseks:
+
+```bash
+sudo mount -t ceph 192.168.185.21,192.168.185.22,192.168.185.23:/ /mnt/cephfs -o name=admin,secret=<key>
+```
+
+Lisaks lisasime /etc/fstab faili automaatse mount'imise taaskäivitamisel.
+
+```bash
+echo "192.168.185.21,192.168.185.22,192.168.185.23:/ /mnt/cephfs ceph name=admin,secret=<key> 0 0" | sudo tee -a /etc/fstab
+```
+Märkus: <key> väärtus võeti failist /etc/ceph/ceph.client.admin.keyring.
+
+### Cephi serveri failide lisamine
