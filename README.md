@@ -565,4 +565,9 @@ Kuna Minecraft user ja directory oli valmis siis oli vaja luua  uus /etc/systemd
 Mincraft.service:
 ![image](https://github.com/user-attachments/assets/45878d6d-eba9-42a4-8c4a-e1e8553c8af5)
 
+system daemonite reloadimine ja boot enable
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable minecraft.service
+```
 
