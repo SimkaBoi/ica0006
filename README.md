@@ -555,3 +555,14 @@ ln -s /mnt/cephfs/world_nether ~/minecraft_server/world_nether
 ln -s /mnt/cephfs/world_the_end ~/minecraft_server/world_the_end
 ln -s /mnt/cephfs/logs ~/minecraft_server/logs
 ```
+
+### Minecrafti serveri teenus ja enable boot peale panemine
+
+Kui VM-ile restart teha siis oleks vaja et minecrafti server käivituks automaatselt
+
+Kuna Minecraft user ja directory oli valmis siis oli vaja luua  uus /etc/systemd/system/minecraft.service 
+
+Mincraft.service:
+![image](https://github.com/user-attachments/assets/45878d6d-eba9-42a4-8c4a-e1e8553c8af5)
+
+
