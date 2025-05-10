@@ -500,7 +500,7 @@ com.mojang.authlib.exceptions.MinecraftClientException: Failed to read from http
 
 Vaatamata võrguveale server töötas ja maailm (`world`) loodi edukalt. Minecrafti server oli nüüd käivitatud ja valmis kasutamiseks.
 
-### VM-i cephi külge mountimine
+## VM-i cephi külge mountimine
 
 Selleks et VM Cephiga ühendada on vaja installida VM-ile ceph-common
 
@@ -536,7 +536,7 @@ student@192.168.180.26:~$ echo "192.168.185.21,192.168.185.22,192.168.185.23:/ /
 ```
 Märkus: <key> väärtus võeti failist /etc/ceph/ceph.client.admin.keyring.
 
-### Minecrafti serveri failide lisamine Cephi
+## Minecrafti serveri failide lisamine Cephi
 
 Minecraftis on kolme tüüpi mappe World, nether ja End. Iga map on vaja lisada cephi ja nendega kaasa tuleks ka lisada Server Log file.
 
@@ -556,7 +556,7 @@ ln -s /mnt/cephfs/world_the_end ~/minecraft_server/world_the_end
 ln -s /mnt/cephfs/logs ~/minecraft_server/logs
 ```
 
-### Minecrafti serveri teenus ja enable boot peale panemine
+## Minecrafti serveri teenus ja enable boot peale panemine
 
 Kui VM-ile restart teha siis oleks vaja et minecrafti server käivituks automaatselt
 
