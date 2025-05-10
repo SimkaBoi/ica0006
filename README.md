@@ -571,3 +571,12 @@ sudo systemctl daemon-reload
 sudo systemctl enable minecraft.service
 ```
 
+## Tõrkekindluse tagamine
+
+Selleks, et kindel olla Minecrafti serveri ja andmete liikumine toimib peale SRV1/2/3 sulgemisel peatasime ükshaaval SRV1/2/3
+
+Minecraft server toimimas peale, SRV2 sulgemist:
+![image](https://github.com/user-attachments/assets/703f792c-bd1c-48d3-983c-52b6129e7ced)
+
+
+
