@@ -556,7 +556,8 @@ ln -s /mnt/cephfs/world_the_end ~/minecraft_server/world_the_end
 ln -s /mnt/cephfs/logs ~/minecraft_server/logs
 ```
 
-Dashboardis failide olemasolu kinnitamine
+Dashboardis failide olemasolu kinnitamine:
+
 ![image](https://github.com/user-attachments/assets/1be4198e-8cac-49bc-b0b3-8d81c05272a3)
 
 
