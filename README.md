@@ -526,14 +526,32 @@ minecraft@lab:~$ sudo mv /tmp/ceph.client.admin.keyring /etc/ceph/ceph.client.ad
 Cephi mountimiseks:
 
 ```bash
-sudo mount -t ceph 192.168.185.21,192.168.185.22,192.168.185.23:/ /mnt/cephfs -o name=admin,secret=<key>
+student@192.168.180.26:~$ sudo mount -t ceph 192.168.185.21,192.168.185.22,192.168.185.23:/ /mnt/cephfs -o name=admin,secret=<key>
 ```
 
 Lisaks lisasime /etc/fstab faili automaatse mount'imise taaskäivitamisel.
 
 ```bash
-echo "192.168.185.21,192.168.185.22,192.168.185.23:/ /mnt/cephfs ceph name=admin,secret=<key> 0 0" | sudo tee -a /etc/fstab
+student@192.168.180.26:~$ echo "192.168.185.21,192.168.185.22,192.168.185.23:/ /mnt/cephfs ceph name=admin,secret=<key> 0 0" | sudo tee -a /etc/fstab
 ```
 Märkus: <key> väärtus võeti failist /etc/ceph/ceph.client.admin.keyring.
 
-### Cephi serveri failide lisamine
+### Minecrafti serveri failide lisamine Cephi
+
+Minecraftis on kolme tüüpi mappe World, nether ja End. Iga map on vaja lisada cephi ja nendega kaasa tuleks ka lisada Server Log file.
+
+Failide liigutamine Cephi
+```bash
+sudo mv ~/minecraft_server/world /mnt/cephfs/world
+sudo mv ~/minecraft_server/world_nether /mnt/cephfs/world_nether
+sudo mv ~/minecraft_server/world_the_end /mnt/cephfs/world_the_end
+sudo mv ~/minecraft_server/logs /mnt/cephfs/logs
+```
+
+Synlinkide loomine:
+```bash
+ln -s /mnt/cephfs/world ~/minecraft_server/world
+ln -s /mnt/cephfs/world_nether ~/minecraft_server/world_nether
+ln -s /mnt/cephfs/world_the_end ~/minecraft_server/world_the_end
+ln -s /mnt/cephfs/logs ~/minecraft_server/logs
+```
