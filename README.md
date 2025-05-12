@@ -18,27 +18,40 @@ Kasutajanimed ning paroolid on kõik samad nii ILO kui virtuaalserverisse sisse 
 
 Provisioneerida andmesalvestus pind virtuaalserverile üle IP võrgu (kas plokina, jagatud failisüsteemina või objektide salvestuskohana). Et muuta ülesanne realistlikumaks, panna seda pinda kasutama kas andmebaas või mingi veebirakendus. Veenduda süsteemi tõrkekindluses, lülitades välja suvaline füüsiline server.
 
+### Ülesannete jaotus
+
+| Ülesanne                                                | Määratud tudeng(id)                         |
+| ------------------------------------------------------- | ------------------------------------------- |
+| Raidi seadistamine                                      | Siim Ristjõe, Georg Veevo, Johann Buschmann |
+| Operatsioonisüsteemi installimine                       | Siim Ristjõe, Georg Veevo, Johann Buschmann |
+| SSH seadistamine                                        | Siim Ristjõe, Georg Veevo, Johann Buschmann |
+| Cephi seadistamine                                      | Siim Ristjõe                                |
+| Virtuaalserveri installeerimine                         | Georg Veevo, Johann Buschmann               |
+| Minecraft serveri seadistamine                          | Georg Veevo                                 |
+| VM-i cephi külge mountimine                             | Georg Veevo                                 |
+| Minecrafti serveri failide lisamine Cephi               | Siim Ristjõe, Georg Veevo                   |
+| Minecrafti serveri teenus ja enable boot peale panemine | Georg Veevo                                 |
+| Tõrkekindluse tagamine                                  | Siim Ristjõe, Georg Veevo                   |
+| Powerpoint slaidid                                      | Johann Buschmann                            |
+
 ## Serverid ning kasutajaandmed
 
 ### Serverid
 
-|Serveri nimi|Serveri IP    |ILO IP       |
-|------------|--------------|-------------|
-|server1     |192.168.185.21|192.168.185.1|
-|server2     |192.168.185.22|192.168.185.2|
-|server3     |192.168.185.23|192.168.185.3|
-
-### Virtuaalmasin
-
-IP aadress `192.168.180.26`
+| Serveri nimi | Serveri IP     | ILO IP        |
+| ------------ | -------------- | ------------- |
+| server1      | 192.168.185.21 | 192.168.185.1 |
+| server2      | 192.168.185.22 | 192.168.185.2 |
+| server3      | 192.168.185.23 | 192.168.185.3 |
+| vm           | 192.168.180.26 |               |
 
 ### Kasutajaandmed
 
 Lihtsuse mõttes otsustasime kasutada kõikjal sama kasutajat ning parooli.
 
-|Nimi   |Parool     |
-|-------|-----------|
-|student|student1234|
+| Nimi    | Parool      |
+| ------- | ----------- |
+| student | student1234 |
 
 ## RAIDi seadistamine
 
@@ -62,11 +75,11 @@ Otsustasime operatsioonisüsteemiks valida [Ubuntu server 24.04](https://ubuntu.
 
 Installi käigus määrasime serveritele staatilise IP koos subnet'i ja default gateway'ga.
 
-|Serveri nimi|Serveri IP    |
-|------------|--------------|
-|server1     |192.168.185.21|
-|server2     |192.168.185.22|
-|server3     |192.168.185.23|
+| Serveri nimi | Serveri IP     |
+| ------------ | -------------- |
+| server1      | 192.168.185.21 |
+| server2      | 192.168.185.22 |
+| server3      | 192.168.185.23 |
 
 Subnet: `255.255.252.0`
 Default gateway: `192.168.187.254`
@@ -103,7 +116,7 @@ Cephadm'i installimiseks kasutatud dokumentatsioon asub [siin](https://docs.ceph
 
 Alustuseks tuli välja valida server, kuhu installime Cephadm'i. See server hakkab Cephi manageerima. Valisime selleks serveriks `server1`.
 
-Cephadm'i installimiseks on kasutasime järgnevat käsku:
+Cephadm'i installimiseks kasutasime järgnevat käsku:
 
 ```bash
 sudo apt install -y cephadm
@@ -261,13 +274,13 @@ student@server1:~# sudo ceph -s
   cluster:
     id:     f8f1d956-1df3-11f0-99e7-3b8bca07a27c
     health: HEALTH_OK
- 
+
   services:
     mon: 3 daemons, quorum server1,server2,server3 (age 3h)
     mgr: server1.jadojs(active, since 5h), standbys: server2.esbgns
     mds: 1/1 daemons up, 2 standby
     osd: 6 osds: 6 up (since 26m), 6 in (since 27m)
- 
+
   data:
     volumes: 1/1 healthy
     pools:   2 pools, 272 pgs
@@ -280,22 +293,20 @@ student@server1:~# sudo ceph -s
 
 ### Terraformi installimine Windowsile
 
-Terraformi installimiseks Windowsile laadisime selle HashiCorpi ametlikult veebilehelt.  
+Terraformi installimiseks Windowsile laadisime selle HashiCorpi ametlikult veebilehelt.
 
-1. Laadisime alla `terraform_1.11.4_windows_amd64.zip\` ja pakkisime kausta `C:\Terraform\`.  
-2. Lisasime `C:\Terraform\` keskkonnamuutujasse `Path\`.  
+1. Laadisime alla `terraform_1.11.4_windows_amd64.zip\` ja pakkisime kausta `C:\Terraform\`.
+2. Lisasime `C:\Terraform\` keskkonnamuutujasse `Path\`.
 3. Pärast PowerShelli taaskäivitamist kontrollisime:
 
-    ```powershell
-    terraform --version
-    ```
+   ```powershell
+   terraform --version
+   ```
 
-    ```
-    Terraform v1.11.4
-    on windows_amd64
-    ```
-
----
+   ```
+   Terraform v1.11.4
+   on windows_amd64
+   ```
 
 ### Projekti seadistamine
 
@@ -368,8 +379,6 @@ resource "vsphere_virtual_machine" "demo" {
 }
 ```
 
----
-
 ### Terraformi initsialiseerimine ja virtuaalmasina loomine
 
 Initsialiseerisime Terraformi:
@@ -410,7 +419,7 @@ Kontrollisime virtuaalmasina detaile:
 terraform state show vsphere_virtual_machine.demo
 ```
 
-```text
+````text
 # vsphere_virtual_machine.demo:
 resource "vsphere_virtual_machine" "demo" {
     default_ip_address = "192.168.180.26"
@@ -421,7 +430,8 @@ resource "vsphere_virtual_machine" "demo" {
 ```EOF
 
 echo "Markdown file 'ICA0006.md' has been generated."
-```
+````
+
 Siit näeme virtuaalmasina automaatselt määratud IP aadressi ja meie pandud nime "grupp_9".
 
 ## Minecrafti serveri seadistamine virtuaalmasinas
@@ -448,6 +458,7 @@ mkdir minecraft_server
 cd minecraft_server
 wget https://api.papermc.io/v2/projects/paper/versions/1.21.4/builds/226/downloads/paper-1.21.4-226.jar
 ```
+
 ### Minecrafti serveri käivitamine
 
 Käivitasime serveri:
@@ -476,7 +487,7 @@ nano server.properties
 
 Failis `eula.txt` asendasime rea `eula=false` reaga `eula=true`.
 
-![image](https://github.com/user-attachments/assets/8cd48e07-0c15-49df-91de-f71f476be0c3)
+![alt text](/images/image-3.png)
 
 ### Serveri uuesti käivitamine
 
@@ -486,19 +497,7 @@ Käivitasime serveri uuesti:
 java -Xmx1024M -Xms1024M -jar paper-1.21.4-226.jar nogui
 ```
 
-Seekord server käivitus edukalt, kuigi ilmnes võrguühenduse tõrge Yggdrasil autentimisteenusega:
-
-Väljund (lühendatud):
-
-```
-[18:53:48 ERROR]: Failed to request yggdrasil public key
-com.mojang.authlib.exceptions.MinecraftClientException: Failed to read from https://api.minecraftservices.com/publickeys due to Connect timed out
-...
-[18:54:12 INFO]: Done preparing level "world" (24.157s)
-[18:54:12 INFO]: Done (34.251s)! For help, type "help"
-```
-
-Vaatamata võrguveale server töötas ja maailm (`world`) loodi edukalt. Minecrafti server oli nüüd käivitatud ja valmis kasutamiseks.
+Seekord server käivitus edukalt ning kõik vajalikud failid said loodud.
 
 ## VM-i cephi külge mountimine
 
@@ -511,7 +510,7 @@ sudo apt install -y ceph-common
 
 Kopeerisime Server-1lt cephi confi ja ceph admin keyringi
 
-```bash
+```
 root@server1:~# scp /etc/ceph/ceph.conf student@192.168.180.26:/tmp/ceph.conf
 student@192.168.180.26's password:
 ceph.conf                                                                             100%  283   363.0KB/s   00:00
@@ -534,13 +533,15 @@ Lisaks lisasime /etc/fstab faili automaatse mount'imise taaskäivitamisel.
 ```bash
 student@192.168.180.26:~$ echo "192.168.185.21,192.168.185.22,192.168.185.23:/ /mnt/cephfs ceph name=admin,secret=<key> 0 0" | sudo tee -a /etc/fstab
 ```
+
 Märkus: <key> väärtus võeti failist /etc/ceph/ceph.client.admin.keyring.
 
 ## Minecrafti serveri failide lisamine Cephi
 
-Minecraftis on kolme tüüpi mappe World, nether ja End. Iga map on vaja lisada cephi ja nendega kaasa tuleks ka lisada Server Log file.
+Minecraftis on kolme tüüpi mappe World, Nether ja End. Iga map on vaja lisada cephi ja nendega kaasa tuleks ka lisada Server Log file.
 
 Failide liigutamine Cephi
+
 ```bash
 sudo mv ~/minecraft_server/world /mnt/cephfs/world
 sudo mv ~/minecraft_server/world_nether /mnt/cephfs/world_nether
@@ -549,6 +550,7 @@ sudo mv ~/minecraft_server/logs /mnt/cephfs/logs
 ```
 
 Synlinkide loomine:
+
 ```bash
 ln -s /mnt/cephfs/world ~/minecraft_server/world
 ln -s /mnt/cephfs/world_nether ~/minecraft_server/world_nether
@@ -558,19 +560,19 @@ ln -s /mnt/cephfs/logs ~/minecraft_server/logs
 
 Dashboardis failide olemasolu kinnitamine:
 
-![image](https://github.com/user-attachments/assets/1be4198e-8cac-49bc-b0b3-8d81c05272a3)
-
+![alt text](/images/image-4.png)
 
 ## Minecrafti serveri teenus ja enable boot peale panemine
 
-Kui VM-ile restart teha siis oleks vaja et minecrafti server käivituks automaatselt
+Kui VM-ile restart teha siis oleks vaja et minecrafti server käivituks automaatselt.
 
-Kuna Minecraft user ja directory oli valmis siis oli vaja luua  uus /etc/systemd/system/minecraft.service 
+Kuna Minecraft user ja directory oli valmis siis oli vaja luua uus /etc/systemd/system/minecraft.service
 
-Mincraft.service:
-![image](https://github.com/user-attachments/assets/45878d6d-eba9-42a4-8c4a-e1e8553c8af5)
+Minecraft.service:
+![alt text](/images/image-5.png)
 
-system daemonite reloadimine ja boot enable
+System daemonite reloadimine ja boot enable
+
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable minecraft.service
@@ -581,7 +583,4 @@ sudo systemctl enable minecraft.service
 Selleks, et kindel olla Minecrafti serveri ja andmete liikumine toimib peale SRV1/2/3 sulgemisel peatasime ükshaaval SRV1/2/3
 
 Minecraft server toimimas peale, SRV2 sulgemist:
-![image](https://github.com/user-attachments/assets/703f792c-bd1c-48d3-983c-52b6129e7ced)
-
-
-
+![alt text](/images/image-6.png)
